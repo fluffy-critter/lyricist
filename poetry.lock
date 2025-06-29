@@ -677,18 +677,6 @@ files = [
 ]
 
 [[package]]
-name = "monkeypatching"
-version = "0.2.0"
-description = "A Python package designed for temporary recursive monkeypatching."
-optional = false
-python-versions = ">=3.6"
-groups = ["main"]
-files = [
-    {file = "monkeypatching-0.2.0-py3-none-any.whl", hash = "sha256:6cc6d9002e57050bf9885e20e6602d20713d054eec123c98f297f17548037d37"},
-    {file = "monkeypatching-0.2.0.tar.gz", hash = "sha256:2ccf764f7fb47ae535d2f2c84e877d1af9d74fcc03f528dde9fe7a508d963c0c"},
-]
-
-[[package]]
 name = "more-itertools"
 version = "10.7.0"
 description = "More routines for operating on iterables, beyond itertools"
@@ -1703,4 +1691,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "f23513c3e9ecceb703ca8733e68802f27f9a493ece1e445804cabb87e02889df"
+content-hash = "28f88cef88c95c14c5259a6140163268b10e30beb0c37136e31089ac85fdf170"
