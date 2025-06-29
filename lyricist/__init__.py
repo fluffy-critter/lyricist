@@ -17,6 +17,7 @@ class Context:
     def scan_file(self, path, root_dir):
         """ scan a file """
         name, ext = os.path.splitext(path)
+        # TODO support other formats
         if ext != '.mp3':
             return
 
@@ -30,6 +31,8 @@ class Context:
             LOGGER.debug("Lyric file %s already exists", outfile)
             return
 
+        # TODO use mutagen to parse existing lyrics instead of using whisper
+
         lyrics = self.model.transcribe(path, verbose=True)
         lines = '\n'.join([seg.get('text','')
              for seg in lyrics.get('segments', [])])
@@ -37,6 +40,8 @@ class Context:
             LOGGER.debug("Got %s lyrics:\n%s", lyrics.get('language'), lines)
         with open(outfile, 'w') as output:
             output.write(lines)
+
+        # TODO optionally write lyrics in if so specified
 
     def scan_dir(self, basedir):
         """ scan a directory """
