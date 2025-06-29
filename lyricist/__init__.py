@@ -50,8 +50,6 @@ class Context:
         except Exception as e:
             LOGGER.exception("Error extracting lyrics from %s: %s", path, e)
 
-        if lyrics is not None:
-
         # TODO optionally write lyrics to id3 tag if so specified
 
     def extract_vocals(self, path, outdir):
