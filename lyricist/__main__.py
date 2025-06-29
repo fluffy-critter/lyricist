@@ -24,6 +24,8 @@ def parse_args():
 
     parser.add_argument('--demucs', '-d', help="separate out the vocals first",
         action='store_true')
+    parser.add_argument('--demucs-model', help="DEMUCS model to use",
+        default='mdx_extra_q')
 
     return parser.parse_args()
 

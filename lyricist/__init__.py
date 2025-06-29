@@ -53,14 +53,15 @@ class Context:
         # TODO optionally write lyrics to id3 tag if so specified
 
     def extract_vocals(self, path, outdir):
+        model = self.options.demucs_model
         demucs.separate.main(['--mp3',
             '--two-stems', 'vocals',
             path,
-            '-n', 'htdemucs',
+            '-n', model,
             '-o', outdir,
             '--filename', '{stem}.{ext}'])
 
-        return os.path.join(outdir, 'htdemucs', 'vocals.mp3')
+        return os.path.join(outdir, model, 'vocals.mp3')
 
 
     def extract_lyrics(self, path):
