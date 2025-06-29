@@ -11,7 +11,8 @@ dependencies = [
     "openai-whisper (>=20250625,<20250626)",
     "demucs (>=4.0.1,<5.0.0)",
     "mutagen (>=1.47.0,<2.0.0)",
-    "diffq (>=0.2.4,<0.3.0)"
+    "diffq (>=0.2.4,<0.3.0)",
+    "monkeypatching (>=0.2.0,<0.3.0)"
 ]
 
 
