@@ -6,17 +6,8 @@ import os.path
 import whisper
 import demucs.separate
 import logging
-from monkeypatching import monkeypatch_setattr
 
 LOGGER=logging.getLogger(__name__)
-
-class DecodeError(RuntimeError):
-    pass
-
-def raise_decode_error(path):
-    def _except(*args, **kws):
-        raise DecodeError(path)
-    return _except
 
 class Context:
     def __init__(self, args):
@@ -46,7 +37,7 @@ class Context:
             try:
                 path = self.extract_vocals(path, outdir)
                 LOGGER.debug("Extracted vocals to %s", path)
-            except DecodeError as e:
+            except Exception as e:
                 LOGGER.error("Error extracting vocals from %s", path)
 
         try:
@@ -55,7 +46,7 @@ class Context:
             with open(outfile, 'w') as output:
                 output.write(lyrics)
                 output.write('\n')
-        except DecodeError as e:
+        except Exception as e:
             LOGGER.error("Error extracting lyrics from %s: %s", path)
 
         # TODO optionally write lyrics to id3 tag if so specified
@@ -63,8 +54,7 @@ class Context:
     def extract_vocals(self, path, outdir):
 
         # why do AI people call sys.exit instead of raising a fucking exception
-        import sys
-        with monkeypatch_setattr(sys, "exit", raise_decode_error(path)):
+        try:
             model = self.options.demucs_model
             demucs.separate.main(['--mp3',
                 '--two-stems', 'vocals',
@@ -74,18 +64,21 @@ class Context:
                 '--filename', '{stem}.{ext}'])
 
             return os.path.join(outdir, model, 'vocals.mp3')
+        except SystemExit as e:
+            raise RuntimeError(path) from e
 
 
     def extract_lyrics(self, path):
         # why do AI people call sys.exit instead of raising a fucking exception
-        import sys
-        with monkeypatch_setattr(sys, "exit", raise_decode_error(path)):
+        try:
             lyrics = self.model.transcribe(path, verbose=self.options.verbosity > 1)
             lines = '\n'.join([seg.get('text','')
                  for seg in lyrics.get('segments', [])])
             if lines:
                 LOGGER.debug("Got %s lyrics:\n%s", lyrics.get('language'), lines)
             return lines
+        except SystemExit as e:
+            raise RuntimeError(path) from e
 
 
     def scan_dir(self, basedir):
