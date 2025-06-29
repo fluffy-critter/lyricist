@@ -4,7 +4,7 @@ import mutagen
 import os
 import os.path
 import whisper
-import demucs
+import demucs.separate
 import logging
 
 LOGGER=logging.getLogger(__name__)
@@ -24,25 +24,58 @@ class Context:
         outdir = os.path.join(self.options.output_dir,
             os.path.dirname(os.path.relpath(path, root_dir)))
         os.makedirs(outdir, exist_ok=True)
-        LOGGER.debug("scanning %s", path)
 
         outfile = os.path.join(outdir, os.path.basename(name)) + '.txt'
         if os.path.isfile(outfile):
-            LOGGER.debug("Lyric file %s already exists", outfile)
+            LOGGER.info("Lyric file %s already exists", outfile)
             return
 
-        # TODO use mutagen to parse existing lyrics instead of using whisper
-        # TODO use demucs to extract cleaner vocals to make whisper's job easier
+        LOGGER.info("scanning %s -> %s", path, outfile)
 
+        # TODO use mutagen to parse existing lyrics instead of using whisper
+
+        if self.options.demucs:
+            try:
+                path = self.extract_vocals(path, outdir)
+                LOGGER.debug("Extracted vocals to %s", path)
+            except Exception as e:
+                LOGGER.exception("Error extracting vocals from %s: %s", path, e)
+
+        try:
+            lyrics = self.extract_lyrics(path)
+        except Exception as e:
+            LOGGER.exception("Error extracting lyrics from %s: %s", path, e)
+            lyrics = ''
+
+        if lyrics:
+            LOGGER.debug('Saving lyrics to %s', outfile)
+            with open(outfile, 'w') as output:
+                output.write(lyrics)
+                output.write('\n')
+
+            # TODO optionally write lyrics to id3 tag if so specified
+        else:
+            LOGGER.warning('No lyrics were extracted')
+
+    def extract_vocals(self, path, outdir):
+        demucs.separate.main(['--mp3',
+            '--two-stems', 'vocals',
+            path,
+            '-n', 'htdemucs',
+            '-o', outdir,
+            '--filename', '{stem}.{ext}'])
+
+        return os.path.join(outdir, 'htdemucs', 'vocals.mp3')
+
+
+    def extract_lyrics(self, path):
         lyrics = self.model.transcribe(path, verbose=True)
         lines = '\n'.join([seg.get('text','')
              for seg in lyrics.get('segments', [])])
         if lines:
             LOGGER.debug("Got %s lyrics:\n%s", lyrics.get('language'), lines)
-        with open(outfile, 'w') as output:
-            output.write(lines)
+        return lines
 
-        # TODO optionally write lyrics in if so specified
 
     def scan_dir(self, basedir):
         """ scan a directory """

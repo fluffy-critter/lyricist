@@ -22,6 +22,9 @@ def parse_args():
     parser.add_argument('--model', '-m', help="Whisper model to use",
         default='turbo')
 
+    parser.add_argument('--demucs', '-d', help="separate out the vocals first",
+        action='store_true')
+
     return parser.parse_args()
 
 
