@@ -22,3 +22,5 @@ build-backend = "poetry.core.masonry.api"
 autopep8 = "^2.3.2"
 pylint = "^3.3.7"
 
+[tool.poetry.scripts]
+lyricist = 'lyricist.__main__:main'
