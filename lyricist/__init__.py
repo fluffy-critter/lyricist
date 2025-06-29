@@ -43,19 +43,16 @@ class Context:
 
         try:
             lyrics = self.extract_lyrics(path)
-        except Exception as e:
-            LOGGER.exception("Error extracting lyrics from %s: %s", path, e)
-            lyrics = ''
-
-        if lyrics:
             LOGGER.debug('Saving lyrics to %s', outfile)
             with open(outfile, 'w') as output:
                 output.write(lyrics)
                 output.write('\n')
+        except Exception as e:
+            LOGGER.exception("Error extracting lyrics from %s: %s", path, e)
 
-            # TODO optionally write lyrics to id3 tag if so specified
-        else:
-            LOGGER.warning('No lyrics were extracted')
+        if lyrics is not None:
+
+        # TODO optionally write lyrics to id3 tag if so specified
 
     def extract_vocals(self, path, outdir):
         demucs.separate.main(['--mp3',
@@ -69,7 +66,7 @@ class Context:
 
 
     def extract_lyrics(self, path):
-        lyrics = self.model.transcribe(path, verbose=True)
+        lyrics = self.model.transcribe(path, verbose=self.options.verbosity > 1)
         lines = '\n'.join([seg.get('text','')
              for seg in lyrics.get('segments', [])])
         if lines:
