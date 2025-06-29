@@ -32,6 +32,7 @@ class Context:
             return
 
         # TODO use mutagen to parse existing lyrics instead of using whisper
+        # TODO use demucs to extract cleaner vocals to make whisper's job easier
 
         lyrics = self.model.transcribe(path, verbose=True)
         lines = '\n'.join([seg.get('text','')
