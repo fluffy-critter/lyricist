@@ -59,7 +59,8 @@ class Context:
             path,
             '-n', model,
             '-o', outdir,
-            '--filename', '{stem}.{ext}'])
+            '--filename', '{stem}.{ext}',
+            '-j', f'{os.cpu_count()}'])
 
         return os.path.join(outdir, model, 'vocals.mp3')
 
